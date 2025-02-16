@@ -49,4 +49,7 @@ jobs:
           docker push my-docker-registry.com/$IMAGE_TAG
 
       - name: Output Image Name
-        run: echo "Image pushed: ${{ secrets.DOCKER_REGISTRY }}/$IMAGE_TAG"
+        run: |
+          echo "Image pushed: ${{ secrets.DOCKER_REGISTRY }}/$IMAGE_TAG"
+
+
