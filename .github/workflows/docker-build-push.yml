@@ -1,0 +1,66 @@
+name: Build and Push Docker Image on PR to Main
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the PR branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Extract App Name, Version & Dockerfile
+        id: extract-info
+        run: |
+          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          
+          if [[ "$BRANCH_NAME" =~ ^image/([a-zA-Z0-9_-]+)-v([0-9]+)$ ]]; then
+            APP_NAME="${BASH_REMATCH[1]}"
+            VERSION="v${BASH_REMATCH[2]}"
+            IMAGE_TAG="${APP_NAME}:${VERSION}"
+            DOCKERFILE_NAME="Dockerfile_${APP_NAME}-${VERSION}"
+            
+            echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+            echo "DOCKERFILE_NAME=$DOCKERFILE_NAME" >> $GITHUB_ENV
+          else
+            echo "❌ Branch name does not match expected pattern. Exiting."
+            exit 1
+          fi
+
+      - name: Validate Dockerfile
+        run: |
+          if [ ! -f "$DOCKERFILE_NAME" ]; then
+            echo "❌ Error: Dockerfile '$DOCKERFILE_NAME' not found. Exiting."
+            exit 1
+          fi
+          echo "✅ Dockerfile '$DOCKERFILE_NAME' found."
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_REGISTRY }}/$IMAGE_TAG -f $DOCKERFILE_NAME .
+
+      - name: Log in to Docker Registry
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKER_REGISTRY }}/$IMAGE_TAG
+
+      - name: Output Image Name
+        run: |
+          echo "✅ Image pushed: ${{ secrets.DOCKER_REGISTRY }}/$IMAGE_TAG"
+
+      # 🚀 Ensuring Docker logout always runs, even if a previous step fails
+      - name: Log out from Docker Registry
+        if: always()   # <-- This makes sure logout runs even if previous steps fail
+        run: docker logout
