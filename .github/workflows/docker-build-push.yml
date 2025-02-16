@@ -46,7 +46,7 @@ jobs:
           fi
           echo "✅ Dockerfile '$DOCKERFILE_NAME' found."
           if [ ! -f "$README_FILE" ]; then
-            echo "❌ Error: README '$DOCKERFILE_NAME' not found. Exiting."
+            echo "❌ Error: README '$README_FILE' not found. Exiting."
             exit 1
           fi
           echo "✅ README '$README_FILE' found."
