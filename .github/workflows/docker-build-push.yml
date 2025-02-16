@@ -81,10 +81,10 @@ jobs:
           # Use curl to get the token
           response=$(curl -X POST \
             -H "Content-Type: application/json" \
-            -d '{"identifier": "${{ secrets.DOCKER_USERNAME }}", "secret": "${{ secrets.DOCKER_PASSWORD }}"}' \
+            -d "{\"identifier\": \"${{ secrets.DOCKER_USERNAME }}\", \"secret\": \"${{ secrets.DOCKER_PASSWORD }}\"}" \
             "https://hub.docker.com/v2/auth/token/")
 
-          token=$(echo $response | jq -r '.access_token')
+          token=$(echo $response | jq -r ".access_token")
           
           # Use curl to update the Docker Hub repository description
           curl -X PATCH \
