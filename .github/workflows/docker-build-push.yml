@@ -67,33 +67,33 @@ jobs:
         run: |
           echo "✅ Image pushed: ${{ secrets.DOCKER_REGISTRY }}/$IMAGE_TAG"
 
-      - name: Update Docker Hub description with README content
-        run: |
-          # Ensure README_FILE is set from the previous steps
-          echo "Using README file: ${{ env.README_FILE }}"
+      # - name: Update Docker Hub description with README content
+      #   run: |
+      #     # Ensure README_FILE is set from the previous steps
+      #     echo "Using README file: ${{ env.README_FILE }}"
 
-          # Read the README file into a variable
-          DESCRIPTION=$(<"${{ env.README_FILE }}")
+      #     # Read the README file into a variable
+      #     DESCRIPTION=$(<"${{ env.README_FILE }}")
 
-          # Replace any newlines within the file with a placeholder (to prevent issues)
-          DESCRIPTION=$(echo "$DESCRIPTION" | sed ':a;N;$!ba;s/\n/\\n/g')
+      #     # Replace any newlines within the file with a placeholder (to prevent issues)
+      #     DESCRIPTION=$(echo "$DESCRIPTION" | sed ':a;N;$!ba;s/\n/\\n/g')
 
-          # Use curl to get the token
-          response=$(curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"identifier\": \"${{ secrets.DOCKER_USERNAME }}\", \"secret\": \"${{ secrets.DOCKER_PASSWORD }}\"}" \
-            "https://hub.docker.com/v2/auth/token/")
+      #     # Use curl to get the token
+      #     response=$(curl -X POST \
+      #       -H "Content-Type: application/json" \
+      #       -d "{\"identifier\": \"${{ secrets.DOCKER_USERNAME }}\", \"secret\": \"${{ secrets.DOCKER_PASSWORD }}\"}" \
+      #       "https://hub.docker.com/v2/auth/token/")
 
-          token=$(echo $response | jq -r ".access_token")
+      #     token=$(echo $response | jq -r ".access_token")
           
-          # Use curl to update the Docker Hub repository description
-          curl -X PATCH \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $token" \
-            -d "{\"full_description\": \"$DESCRIPTION\"}" \
-            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/$APP_NAME/"
+      #     # Use curl to update the Docker Hub repository description
+      #     curl -X PATCH \
+      #       -H "Content-Type: application/json" \
+      #       -H "Authorization: Bearer $token" \
+      #       -d "{\"full_description\": \"$DESCRIPTION\"}" \
+      #       "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/$APP_NAME/"
           
-          echo "Docker Hub description updated successfully!"
+      #     echo "Docker Hub description updated successfully!"
 
       # 🚀 Ensuring Docker logout always runs, even if a previous step fails
       - name: Log out from Docker Registry
