@@ -47,6 +47,21 @@ app.get('/route3', (req, res) => {
     });
 });
 
+// Route 4: A route with a 5-second res timeout and calls Route 1 internally
+app.get('/route4', (req, res) => {
+  res.setTimeout(5000)
+  // Simulating the call to Route 1 (internally)
+  fetchRoute1()
+    .then(response => {
+      //clearTimeout(timeout);  // Clear timeout if route 1 succeeds within time
+      res.status(200).send(response);
+    })
+    .catch(error => {
+      //clearTimeout(timeout);  // Clear timeout if there's an error
+      res.status(500).send('Failed to call Route 1');
+    });
+});
+
 // Helper function to simulate calling Route 1 internally
 const fetchRoute1 = async () => {
   console.log('Calling Route 1 internally...');
