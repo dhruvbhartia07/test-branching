@@ -1,4 +1,4 @@
-# To Update
+# Check Cronjob behaviour for different responses
 ## Routes
 1. `/route1`: Returns 200 after 10 sec process delay
 2. `/route2`: Returns 500 after 10 sec process delay
@@ -6,6 +6,7 @@
 4. `/route4`: Internally calls route1 but the api is interrupted in 5 sec, empty response, simulates network error
 5. `/route5`: Internally calls route1 but the api is interrupted in 5 sec, 408 response from app stating timeout from app
 
+## Setup
 Can use below cronjob to call different endpoint and check the behaviour
 
 cronjob file
@@ -15,10 +16,10 @@ kind: CronJob
 metadata:
   name: call-route1-cronjob
 spec:
+  suspend: true # for manual trigger, can remove this to have automatic trigger
   schedule: "*/5 * * * *"  # Runs every 5 minutes, you can modify this as needed
   jobTemplate:
     spec:
-      suspend: true
       template:
         spec:
           containers:
