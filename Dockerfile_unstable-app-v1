@@ -1,0 +1,14 @@
+# Use a lightweight Node.js base image
+FROM node:24-alpine
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy your app file
+COPY app.js .
+
+# Expose the port your app runs on
+EXPOSE 3000
+
+# Run the app
+CMD ["node", "app.js"]
